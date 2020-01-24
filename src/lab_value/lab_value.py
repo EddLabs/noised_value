@@ -12,14 +12,20 @@ class LabValue:
     @property
     def var(self):
         if self.__var is None:
-            self.__var = self.__err ** 2
+            self.__var = self.err ** 2
         return self.__var
 
     @property
     def err(self):
         if self.__err is None:
-            self.__err = math.sqrt(self.__var)
+            self.__err = math.sqrt(self.var)
         return self.__err
+
+    @property
+    def relative_err(self):
+        if self.__relative_err is None:
+            self.__relative_err = self.err / math.fabs(self.val)
+        return self.__relative_err
 
     def __neg__(self):
         return LabValue(val=-self.val, var=self.var)
@@ -60,7 +66,7 @@ class LabValue:
 
     def __set_initial_errors(self, var, err):
         if var is None and err is None:
-            self.__var = self.__err = 0
+            self.__var = self.__err = self.__relative_err = 0
             return
         if var is not None:
             if var < 0:
@@ -71,7 +77,8 @@ class LabValue:
             raise ValueError(f"Error must be non-negative, got {err}")
         self.__var = var
         self.__err = err
+        self.__relative_err = None
 
     def __repr__(self):
-        return f"{self.val} {PLUS_MINUS} {self.err}"
+        return f"{self.val} {PLUS_MINUS} {self.err} ({self.relative_err * 100 :.3f}% error)"
 

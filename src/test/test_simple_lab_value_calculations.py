@@ -14,107 +14,120 @@ class TestLabValue(TestCase):
                                msg="Variance is different than expected")
         self.assertAlmostEqual(self.expected_err, self.v.err, places=self.places,
                                msg="Error is different than expected")
+        self.assertAlmostEqual(self.expected_relative_err, self.v.relative_err, places=self.places,
+                               msg="Relative error is different than expected")
 
     # Initialization
 
     def test_init_without_variance_or_error(self):
-        self.v = LabValue(val=1)
-        self.expected_val = 1
+        self.v = LabValue(val=1.5)
+        self.expected_val = 1.5
         self.expected_var = 0
         self.expected_err = 0
+        self.expected_relative_err = 0
 
         self.check()
 
     def test_init_with_variance(self):
-        self.v = LabValue(val=1, var=0.5)
-        self.expected_val = 1
-        self.expected_var = 0.5
-        self.expected_err = 0.70711
+        self.v = LabValue(val=1.5, err=0.5)
+        self.expected_val = 1.5
+        self.expected_var = 0.25
+        self.expected_err = 0.5
+        self.expected_relative_err = 0.33333
 
         self.check()
 
     def test_init_with_error(self):
-        self.v = LabValue(val=1, err=0.5)
-        self.expected_val = 1
+        self.v = LabValue(val=1.5, err=0.5)
+        self.expected_val = 1.5
         self.expected_var = 0.25
         self.expected_err = 0.5
+        self.expected_relative_err = 0.33333
 
         self.check()
 
     def test_init_with_both_variance_and_error_raises_value_error(self):
-        self.assertRaises(ValueError, LabValue, val=1, var=0.25, err=0.5)
+        self.assertRaises(ValueError, LabValue, val=1.5, var=0.25, err=0.5)
 
     def test_init_with_negative_variance_raises_value_error(self):
-        self.assertRaises(ValueError, LabValue, val=1, var=-0.25)
+        self.assertRaises(ValueError, LabValue, val=1.5, var=-0.25)
 
     def test_init_with_negative_error_raises_value_error(self):
-        self.assertRaises(ValueError, LabValue, val=1, err=-0.5)
+        self.assertRaises(ValueError, LabValue, val=1.5, err=-0.5)
 
     # Representation
 
     def test_representation(self):
-        v = LabValue(val=1, err=0.5)
-        self.assertEqual("1 \u00B1 0.5", str(v), msg="LabUtil representation is different than expected")
+        v = LabValue(val=1.5, err=0.5)
+        self.assertEqual("1.5 \u00B1 0.5 (33.333% error)", str(v),
+                         msg="LabUtil representation is different than expected")
 
     # Negative
 
     def test_negative(self):
-        self.v = -LabValue(val=1, var=0.5)
-        self.expected_val = -1
+        self.v = -LabValue(val=1.5, var=0.5)
+        self.expected_val = -1.5
         self.expected_var = 0.5
         self.expected_err = 0.70711
+        self.expected_relative_err = 0.4714
 
         self.check()
 
     # Add
 
     def test_right_add_constant(self):
-        self.v = LabValue(val=1, var=0.5) + 2.2
-        self.expected_val = 3.2
+        self.v = LabValue(val=1.5, var=0.5) + 2.2
+        self.expected_val = 3.7
         self.expected_var = 0.5
         self.expected_err = 0.70711
+        self.expected_relative_err = 0.19111
 
         self.check()
 
     def test_left_add_constant(self):
-        self.v = 2.2 + LabValue(val=1, var=0.5)
-        self.expected_val = 3.2
+        self.v = 2.2 + LabValue(val=1.5, var=0.5)
+        self.expected_val = 3.7
         self.expected_var = 0.5
         self.expected_err = 0.70711
+        self.expected_relative_err = 0.19111
 
         self.check()
 
     def test_add_other_lab_value(self):
-        self.v = LabValue(val=1, var=0.5) + LabValue(val=2.2, var=2.75)
-        self.expected_val = 3.2
+        self.v = LabValue(val=1.5, var=0.5) + LabValue(val=2.2, var=2.75)
+        self.expected_val = 3.7
         self.expected_var = 3.25
         self.expected_err = 1.802775
+        self.expected_relative_err = 0.487236
 
         self.check()
 
     # Subtract
 
     def test_right_subtract_constant(self):
-        self.v = LabValue(val=1, var=0.5) - 2.2
-        self.expected_val = -1.2
+        self.v = LabValue(val=1.5, var=0.5) - 2.2
+        self.expected_val = -0.7
         self.expected_var = 0.5
         self.expected_err = 0.70711
+        self.expected_relative_err = 1.010157
 
         self.check()
 
     def test_left_subtract_constant(self):
-        self.v = 2.2 - LabValue(val=1, var=0.5)
-        self.expected_val = 1.2
+        self.v = 2.2 - LabValue(val=1.5, var=0.5)
+        self.expected_val = 0.7
         self.expected_var = 0.5
         self.expected_err = 0.70711
+        self.expected_relative_err = 1.010157
 
         self.check()
 
     def test_subtract_other_lab_value(self):
-        self.v = LabValue(val=1, var=0.5) - LabValue(val=2.2, var=2.75)
-        self.expected_val = -1.2
+        self.v = LabValue(val=1.5, var=0.5) - LabValue(val=2.2, var=2.75)
+        self.expected_val = -0.7
         self.expected_var = 3.25
         self.expected_err = 1.802775
+        self.expected_relative_err = 2.57539
 
         self.check()
 
@@ -125,6 +138,7 @@ class TestLabValue(TestCase):
         self.expected_val = 1.68
         self.expected_var = 0.6272
         self.expected_err = 0.79196
+        self.expected_relative_err = 0.4714
 
         self.check()
 
@@ -133,6 +147,7 @@ class TestLabValue(TestCase):
         self.expected_val = -1.68
         self.expected_var = 0.6272
         self.expected_err = 0.79196
+        self.expected_relative_err = 0.4714
 
         self.check()
 
@@ -141,6 +156,7 @@ class TestLabValue(TestCase):
         self.expected_val = 1.68
         self.expected_var = 0.6272
         self.expected_err = 0.79196
+        self.expected_relative_err = 0.4714
 
         self.check()
 
@@ -149,6 +165,7 @@ class TestLabValue(TestCase):
         self.expected_val = -1.68
         self.expected_var = 0.6272
         self.expected_err = 0.79196
+        self.expected_relative_err = 0.4714
 
         self.check()
 
@@ -157,6 +174,7 @@ class TestLabValue(TestCase):
         self.expected_val = 3.45
         self.expected_var = 8.8325
         self.expected_err = 2.97195
+        self.expected_relative_err = 0.861435
 
         self.check()
 
@@ -165,6 +183,7 @@ class TestLabValue(TestCase):
         self.expected_val = -3.45
         self.expected_var = 8.8325
         self.expected_err = 2.97195
+        self.expected_relative_err = 0.861435
 
         self.check()
 
@@ -175,6 +194,7 @@ class TestLabValue(TestCase):
         self.expected_val = 1.339285
         self.expected_var = 0.3986
         self.expected_err = 0.631345
+        self.expected_relative_err = 0.4714
 
         self.check()
 
@@ -183,6 +203,7 @@ class TestLabValue(TestCase):
         self.expected_val = -1.339285
         self.expected_var = 0.3986
         self.expected_err = 0.631345
+        self.expected_relative_err = 0.4714
 
         self.check()
 
@@ -191,6 +212,7 @@ class TestLabValue(TestCase):
         self.expected_val = 0.746666
         self.expected_var = 0.12389
         self.expected_err = 0.35198
+        self.expected_relative_err = 0.4714
 
         self.check()
 
@@ -199,6 +221,7 @@ class TestLabValue(TestCase):
         self.expected_val = 1.339285
         self.expected_var = 0.68458
         self.expected_err = 0.82739
+        self.expected_relative_err = 0.617787
 
         self.check()
 
@@ -209,6 +232,7 @@ class TestLabValue(TestCase):
         self.expected_val = 1.5
         self.expected_var = 0.25
         self.expected_err = 0.5
+        self.expected_relative_err = 0.33333
 
         self.check()
 
@@ -217,6 +241,7 @@ class TestLabValue(TestCase):
         self.expected_val = 2.25
         self.expected_var = 2.25
         self.expected_err = 1.5
+        self.expected_relative_err = 0.666666
 
         self.check()
 
@@ -225,6 +250,7 @@ class TestLabValue(TestCase):
         self.expected_val = 3.375
         self.expected_var = 11.390625
         self.expected_err = 3.375
+        self.expected_relative_err = 1
 
         self.check()
 
@@ -233,6 +259,7 @@ class TestLabValue(TestCase):
         self.expected_val = 1
         self.expected_var = 0
         self.expected_err = 0
+        self.expected_relative_err = 0
 
         self.check()
 
