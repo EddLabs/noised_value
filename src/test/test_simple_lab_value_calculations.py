@@ -263,9 +263,14 @@ class TestLabValue(TestCase):
 
         self.check()
 
-    def test_negative_power_raise_value_error(self):
-        v = LabValue(val=1.5, err=0.5)
-        self.assertRaises(ValueError, v.__pow__, -1)
+    def test_negative_power(self):
+        self.v = LabValue(val=1.5, err=0.5) ** -1
+        self.expected_val = 0.666666
+        self.expected_var = 0.049382
+        self.expected_err = 0.222222
+        self.expected_relative_err = 0.333333
+
+        self.check()
 
     # N sigma
 

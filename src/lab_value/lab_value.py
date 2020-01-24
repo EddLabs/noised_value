@@ -50,7 +50,7 @@ class LabValue:
     def __mul__(self, other):
         if isinstance(other, LabValue):
             return LabValue(val=self.val * other.val, var=self.var * other.val ** 2 + other.var * self.val ** 2)
-        return LabValue(val=self.val * other, err=math.fabs(other) * self.err)
+        return LabValue(val=self.val * other, var=self.var * other ** 2)
 
     def __rmul__(self, other):
         return self * other
@@ -59,13 +59,17 @@ class LabValue:
         if isinstance(other, LabValue):
             new_var = (self.var * other.val ** 2 + other.var * self.val ** 2) / (other.val ** 4)
             return LabValue(val=self.val / other.val, var=new_var)
-        return LabValue(val=self.val / other, err=self.err / math.fabs(other))
+        return LabValue(val=self.val / other, var=self.var / (other ** 2))
 
     def __rtruediv__(self, other):
         return LabValue(val=other) / self
 
     def __pow__(self, power):
-        return LabValue(val=self.val ** power, err=power * self.err * self.val ** (power - 1))
+        if power == 0:
+            return LabValue(val=1)
+        new_val = self.val ** power
+        new_var = (power ** 2) * (self.val ** (2 * power - 2)) * self.var
+        return LabValue(val=new_val, var=new_var)
 
     def __set_initial_errors(self, var, err):
         if var is None and err is None:
