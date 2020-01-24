@@ -27,6 +27,9 @@ class LabValue:
             self.__relative_err = self.err / math.fabs(self.val)
         return self.__relative_err
 
+    def n_sigma(self, other):
+        return math.fabs(self.val - other.val) / math.sqrt(self.var + other.var)
+
     def __neg__(self):
         return LabValue(val=-self.val, var=self.var)
 
