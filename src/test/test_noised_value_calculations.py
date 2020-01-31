@@ -2,7 +2,7 @@ from unittest import TestCase
 from noised_value.noised_value import NoisedValue
 
 
-class TestNoisedValue(TestCase):
+class NoisedValueBaseTestCase(TestCase):
 
     def setUp(self):
         self.places = 5
@@ -17,7 +17,8 @@ class TestNoisedValue(TestCase):
         self.assertAlmostEqual(self.expected_relative_err, self.v.relative_err, places=self.places,
                                msg="Relative error is different than expected")
 
-    # Initialization
+
+class TestNoisedValueInitialization(NoisedValueBaseTestCase):
 
     def test_init_without_variance_or_error(self):
         self.v = NoisedValue(val=1.5)
@@ -55,14 +56,16 @@ class TestNoisedValue(TestCase):
     def test_init_with_negative_error_raises_value_error(self):
         self.assertRaises(ValueError, NoisedValue, val=1.5, err=-0.5)
 
-    # Representation
+
+class TestNoisedValueRepresentation(NoisedValueBaseTestCase):
 
     def test_representation(self):
         v = NoisedValue(val=1.5, err=0.5)
         self.assertEqual("1.5 \u00B1 0.5 (33.333% error)", str(v),
                          msg="LabUtil representation is different than expected")
 
-    # Negative
+
+class TestNoisedValueNegativeValue(NoisedValueBaseTestCase):
 
     def test_negative(self):
         self.v = -NoisedValue(val=1.5, var=0.5)
@@ -73,7 +76,8 @@ class TestNoisedValue(TestCase):
 
         self.check()
 
-    # Add
+
+class TestNoisedValueAddition(NoisedValueBaseTestCase):
 
     def test_right_add_constant(self):
         self.v = NoisedValue(val=1.5, var=0.5) + 2.2
@@ -102,7 +106,8 @@ class TestNoisedValue(TestCase):
 
         self.check()
 
-    # Subtract
+
+class TestNoisedValueSubtraction(NoisedValueBaseTestCase):
 
     def test_right_subtract_constant(self):
         self.v = NoisedValue(val=1.5, var=0.5) - 2.2
@@ -131,7 +136,8 @@ class TestNoisedValue(TestCase):
 
         self.check()
 
-    # Multiply
+
+class TestNoisedValueMultiplication(NoisedValueBaseTestCase):
 
     def test_right_multiply_positive_constant(self):
         self.v = NoisedValue(val=1.5, var=0.5) * 1.12
@@ -187,7 +193,8 @@ class TestNoisedValue(TestCase):
 
         self.check()
 
-    # Division
+
+class TestNoisedValueDivision(NoisedValueBaseTestCase):
 
     def test_right_divide_positive_constant(self):
         self.v = NoisedValue(val=1.5, var=0.5) / 1.12
@@ -225,7 +232,8 @@ class TestNoisedValue(TestCase):
 
         self.check()
 
-    # Power
+
+class TestNoisedValueIntegerPower(NoisedValueBaseTestCase):
 
     def test_1st_power(self):
         self.v = NoisedValue(val=1.5, err=0.5) ** 1
@@ -272,7 +280,8 @@ class TestNoisedValue(TestCase):
 
         self.check()
 
-    # N sigma
+
+class TestNoisedValueNSigma(NoisedValueBaseTestCase):
 
     def test_n_sigma(self):
         a = NoisedValue(val=12.62, var=0.36)
