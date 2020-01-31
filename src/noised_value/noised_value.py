@@ -89,3 +89,6 @@ class NoisedValue:
     def __repr__(self):
         return f"{self.val} {PLUS_MINUS} {self.err} ({self.relative_err * 100 :.3f}% error)"
 
+
+def mean(lst):
+    return sum(lst) / len(lst)
