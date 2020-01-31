@@ -14,9 +14,11 @@ class NoisedValueBaseTestCase(TestCase):
                                msg="Variance is different than expected")
         self.assertAlmostEqual(self.expected_err, self.v.err, places=self.places,
                                msg="Error is different than expected")
-        print(self.v.relative_err)
-        self.assertAlmostEqual(self.expected_relative_err, self.v.relative_err, places=self.places,
-                               msg="Relative error is different than expected")
+        if self.expected_relative_err is None:
+            self.assertRaises(ValueError, getattr, self.v, "relative_err")
+        else:
+            self.assertAlmostEqual(self.expected_relative_err, self.v.relative_err, places=self.places,
+                                   msg="Relative error is different than expected")
 
 
 class TestNoisedValueInitialization(NoisedValueBaseTestCase):
@@ -53,7 +55,7 @@ class TestNoisedValueInitialization(NoisedValueBaseTestCase):
         self.expected_val = 0
         self.expected_var = 0.25
         self.expected_err = 0.5
-        self.expected_relative_err = 0
+        self.expected_relative_err = None
 
         self.check()
 
@@ -69,10 +71,20 @@ class TestNoisedValueInitialization(NoisedValueBaseTestCase):
 
 class TestNoisedValueRepresentation(NoisedValueBaseTestCase):
 
-    def test_representation(self):
+    def test_representation_of_zero_value(self):
+        v = NoisedValue(val=0, err=0.5)
+        self.assertEqual("0 \u00B1 0.5 (\u221E% error)", str(v),
+                         msg="NoisedValue representation is different than expected")
+
+    def test_representation_of_zero_error(self):
+        v = NoisedValue(val=1.5)
+        self.assertEqual("1.5 \u00B1 0 (0.000% error)", str(v),
+                         msg="NoisedValue representation is different than expected")
+
+    def test_representation_of_non_zero(self):
         v = NoisedValue(val=1.5, err=0.5)
         self.assertEqual("1.5 \u00B1 0.5 (33.333% error)", str(v),
-                         msg="LabUtil representation is different than expected")
+                         msg="NoisedValue representation is different than expected")
 
 
 class TestNoisedValueConstantValues(NoisedValueBaseTestCase):
@@ -82,7 +94,7 @@ class TestNoisedValueConstantValues(NoisedValueBaseTestCase):
         self.expected_val = 0
         self.expected_var = 0
         self.expected_err = 0
-        self.expected_relative_err = 0
+        self.expected_relative_err = None
 
         self.check()
 

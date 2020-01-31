@@ -1,6 +1,7 @@
 import math
 
 PLUS_MINUS = "\u00B1"
+INFINITY = "\u221E"
 
 
 class NoisedValue:
@@ -23,8 +24,10 @@ class NoisedValue:
 
     @property
     def relative_err(self):
+        if self.val == 0:
+            raise ValueError("No relative err since value is 0")
         if self.__relative_err is None:
-            self.__relative_err = self.__calc_relative_error()
+            self.__relative_err = self.err / math.fabs(self.val)
         return self.__relative_err
 
     def n_sigma(self, other):
@@ -72,12 +75,10 @@ class NoisedValue:
         return NoisedValue(val=new_val, var=new_var)
 
     def __repr__(self):
-        return f"{self.val} {PLUS_MINUS} {self.err} ({self.relative_err * 100 :.3f}% error)"
+        return f"{self.val} {PLUS_MINUS} {self.err} ({self.__relative_error_repr()}% error)"
 
-    def __calc_relative_error(self):
-        if self.val == 0:
-            return 0
-        return self.err / math.fabs(self.val)
+    def is_zero(self):
+        return self.val == 0
 
     def __set_initial_errors(self, var, err):
         if var is None and err is None:
@@ -93,6 +94,11 @@ class NoisedValue:
         self.__var = var
         self.__err = err
         self.__relative_err = None
+
+    def __relative_error_repr(self):
+        if self.is_zero():
+            return INFINITY
+        return f"{self.relative_err * 100 :.3f}"
 
 
 def zero():

@@ -11,3 +11,5 @@ expected_eta = NoisedValue(val=12.5, err=1.44)
 print(f"experiment eta is: {eta}")
 print(f"expected eta is: {expected_eta}")
 print(f"n sigma is: {expected_eta.n_sigma(eta)}")
+
+print(NoisedValue(val=0, err=1))
