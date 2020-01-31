@@ -24,7 +24,7 @@ class NoisedValue:
     @property
     def relative_err(self):
         if self.__relative_err is None:
-            self.__relative_err = self.err / math.fabs(self.val)
+            self.__relative_err = self.__calc_relative_error()
         return self.__relative_err
 
     def n_sigma(self, other):
@@ -71,6 +71,14 @@ class NoisedValue:
         new_var = (power ** 2) * (self.val ** (2 * power - 2)) * self.var
         return NoisedValue(val=new_val, var=new_var)
 
+    def __repr__(self):
+        return f"{self.val} {PLUS_MINUS} {self.err} ({self.relative_err * 100 :.3f}% error)"
+
+    def __calc_relative_error(self):
+        if self.val == 0:
+            return 0
+        return self.err / math.fabs(self.val)
+
     def __set_initial_errors(self, var, err):
         if var is None and err is None:
             self.__var = self.__err = self.__relative_err = 0
@@ -86,8 +94,13 @@ class NoisedValue:
         self.__err = err
         self.__relative_err = None
 
-    def __repr__(self):
-        return f"{self.val} {PLUS_MINUS} {self.err} ({self.relative_err * 100 :.3f}% error)"
+
+def zero():
+    return NoisedValue(0)
+
+
+def one():
+    return NoisedValue(1)
 
 
 def mean(lst):

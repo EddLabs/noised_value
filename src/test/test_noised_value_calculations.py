@@ -1,5 +1,5 @@
 from unittest import TestCase
-from noised_value.noised_value import NoisedValue, mean
+from noised_value.noised_value import NoisedValue, mean, zero, one
 
 
 class NoisedValueBaseTestCase(TestCase):
@@ -14,6 +14,7 @@ class NoisedValueBaseTestCase(TestCase):
                                msg="Variance is different than expected")
         self.assertAlmostEqual(self.expected_err, self.v.err, places=self.places,
                                msg="Error is different than expected")
+        print(self.v.relative_err)
         self.assertAlmostEqual(self.expected_relative_err, self.v.relative_err, places=self.places,
                                msg="Relative error is different than expected")
 
@@ -47,6 +48,15 @@ class TestNoisedValueInitialization(NoisedValueBaseTestCase):
 
         self.check()
 
+    def test_init_with_value_zero(self):
+        self.v = NoisedValue(val=0, err=0.5)
+        self.expected_val = 0
+        self.expected_var = 0.25
+        self.expected_err = 0.5
+        self.expected_relative_err = 0
+
+        self.check()
+
     def test_init_with_both_variance_and_error_raises_value_error(self):
         self.assertRaises(ValueError, NoisedValue, val=1.5, var=0.25, err=0.5)
 
@@ -63,6 +73,27 @@ class TestNoisedValueRepresentation(NoisedValueBaseTestCase):
         v = NoisedValue(val=1.5, err=0.5)
         self.assertEqual("1.5 \u00B1 0.5 (33.333% error)", str(v),
                          msg="LabUtil representation is different than expected")
+
+
+class TestNoisedValueConstantValues(NoisedValueBaseTestCase):
+
+    def test_zero(self):
+        self.v = zero()
+        self.expected_val = 0
+        self.expected_var = 0
+        self.expected_err = 0
+        self.expected_relative_err = 0
+
+        self.check()
+
+    def test_one(self):
+        self.v = one()
+        self.expected_val = 1
+        self.expected_var = 0
+        self.expected_err = 0
+        self.expected_relative_err = 0
+
+        self.check()
 
 
 class TestNoisedValueNegativeValue(NoisedValueBaseTestCase):
