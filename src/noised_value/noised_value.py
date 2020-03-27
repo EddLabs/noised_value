@@ -84,6 +84,16 @@ class NoisedValue(Number):
         var = val * val * self.var
         return NoisedValue(val=val, var=var)
 
+    def sin(self):
+        val = math.sin(self.val)
+        var = self.var * math.cos(self.val) ** 2
+        return NoisedValue(val=val, var=var)
+
+    def cos(self):
+        val = math.cos(self.val)
+        var = self.var * math.sin(self.val) ** 2
+        return NoisedValue(val=val, var=var)
+
     def __repr__(self):
         return (
             f"{self.val} {PLUS_MINUS} {self.err} "
