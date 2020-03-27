@@ -1,11 +1,11 @@
 import math
+from numbers import Number
 
 PLUS_MINUS = "\u00B1"
 INFINITY = "\u221E"
 
 
-class NoisedValue:
-
+class NoisedValue(Number):
     def __init__(self, val, var=None, err=None):
         self.val = val
         self.__set_initial_errors(var, err)
@@ -52,7 +52,10 @@ class NoisedValue:
 
     def __mul__(self, other):
         if isinstance(other, NoisedValue):
-            return NoisedValue(val=self.val * other.val, var=self.var * other.val ** 2 + other.var * self.val ** 2)
+            return NoisedValue(
+                val=self.val * other.val,
+                var=self.var * other.val ** 2 + other.var * self.val ** 2,
+            )
         return NoisedValue(val=self.val * other, var=self.var * other ** 2)
 
     def __rmul__(self, other):
@@ -60,7 +63,9 @@ class NoisedValue:
 
     def __truediv__(self, other):
         if isinstance(other, NoisedValue):
-            new_var = (self.var * other.val ** 2 + other.var * self.val ** 2) / (other.val ** 4)
+            new_var = (self.var * other.val ** 2 + other.var * self.val ** 2) / (
+                other.val ** 4
+            )
             return NoisedValue(val=self.val / other.val, var=new_var)
         return NoisedValue(val=self.val / other, var=self.var / (other ** 2))
 
@@ -74,8 +79,16 @@ class NoisedValue:
         new_var = (power ** 2) * (self.val ** (2 * power - 2)) * self.var
         return NoisedValue(val=new_val, var=new_var)
 
+    def exp(self):
+        val = math.exp(self.val)
+        var = val * val * self.var
+        return NoisedValue(val=val, var=var)
+
     def __repr__(self):
-        return f"{self.val} {PLUS_MINUS} {self.err} ({self.__relative_error_repr()}% error)"
+        return (
+            f"{self.val} {PLUS_MINUS} {self.err} "
+            f"({self.__relative_error_repr()}% error)"
+        )
 
     def is_zero(self):
         return self.val == 0
@@ -88,7 +101,9 @@ class NoisedValue:
             if var < 0:
                 raise ValueError(f"Variance must be non-negative, got {var}")
             if err is not None:
-                raise ValueError("Cannot create a LabValue with both variance and error")
+                raise ValueError(
+                    "Cannot create a LabValue with both variance and error"
+                )
         if err is not None and err < 0:
             raise ValueError(f"Error must be non-negative, got {err}")
         self.__var = var
