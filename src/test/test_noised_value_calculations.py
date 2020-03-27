@@ -1,24 +1,5 @@
-from unittest import TestCase
 from noised_value.noised_value import NoisedValue, mean, zero, one
-
-
-class NoisedValueBaseTestCase(TestCase):
-
-    def setUp(self):
-        self.places = 5
-
-    def check(self):
-        self.assertAlmostEqual(self.expected_val, self.v.val, places=self.places,
-                               msg="Value is different than expected")
-        self.assertAlmostEqual(self.expected_var, self.v.var, places=self.places,
-                               msg="Variance is different than expected")
-        self.assertAlmostEqual(self.expected_err, self.v.err, places=self.places,
-                               msg="Error is different than expected")
-        if self.expected_relative_err is None:
-            self.assertRaises(ValueError, getattr, self.v, "relative_err")
-        else:
-            self.assertAlmostEqual(self.expected_relative_err, self.v.relative_err, places=self.places,
-                                   msg="Relative error is different than expected")
+from test.base_test_cases import NoisedValueBaseTestCase
 
 
 class TestNoisedValueInitialization(NoisedValueBaseTestCase):
